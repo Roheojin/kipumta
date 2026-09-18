@@ -1,4 +1,5 @@
 from supabase import create_client, Client
+from supabase.lib.client_options import ClientOptions
 
 
 # --------------------------------
@@ -10,7 +11,8 @@ SUPABASE_KEY = "여기에_본인의_SUPABASE_KEY"
 
 supabase: Client = create_client(
     SUPABASE_URL,
-    SUPABASE_KEY
+    SUPABASE_KEY,
+    options=ClientOptions(schema="kiwoom")
 )
 
 
@@ -44,7 +46,7 @@ def get_my_profile(user_id):
 
         response = (
             supabase
-            .table("users")
+            .table("user_info")
             .select("user_id, nickname")
             .eq("user_id", user_id)
             .execute()
@@ -73,7 +75,7 @@ def set_nickname(user_id, nickname):
 
         response = (
             supabase
-            .table("users")
+            .table("user_info")
             .update({
                 "nickname": nickname
             })
@@ -81,7 +83,7 @@ def set_nickname(user_id, nickname):
             .execute()
         )
 
-        return True
+        return len(response.data) > 0
 
     except Exception as e:
 
