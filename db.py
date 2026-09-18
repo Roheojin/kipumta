@@ -174,27 +174,12 @@ def end_session(user_id, end_time):
 
             return False
 
-        start_time = session["start_time"]
-
-        from datetime import datetime
-
-        start = datetime.fromisoformat(
-            start_time.replace("Z", "+00:00")
-        )
-
-        study_time = end_time - start
-
-        total_minutes = int(
-            study_time.total_seconds() / 60
-        )
-
         response = (
             supabase
             .schema(SCHEMA)
             .table("study_history")
             .update({
-                "end_time": end_time.isoformat(),
-                "study_minutes": total_minutes
+                "end_time": end_time.isoformat()
             })
             .eq("user_id", user_id)
             .is_("end_time", "null")
