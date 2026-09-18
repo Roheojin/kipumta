@@ -4,6 +4,7 @@ from users import check_nickname
 
 from study import study_menu
 
+from stats import stats_menu
 
 
 # --------------------------------
@@ -16,7 +17,7 @@ def login():
 
         print()
         print("================================")
-        print("           키품타 (KPT)")
+        print("          키움품타 (KPT)")
         print("================================")
 
         email = input("이메일: ")
@@ -88,8 +89,8 @@ def main_menu(user_id, nickname):
         # --------------------------------
 
         elif choice == "2":
-            print('통계 구현중')
-            break
+
+            stats_menu(user_id, nickname)
 
 
         # --------------------------------
@@ -99,7 +100,7 @@ def main_menu(user_id, nickname):
         elif choice == "3":
 
             print()
-            print("키품타를 종료합니다.")
+            print("키움품타를 종료합니다.")
 
             break
 

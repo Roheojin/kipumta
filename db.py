@@ -1,22 +1,18 @@
-import os
-
-from dotenv import load_dotenv
 from supabase import create_client, Client
+from supabase.lib.client_options import ClientOptions
 
 
 # --------------------------------
 # Supabase 연결
 # --------------------------------
 
-load_dotenv()
+SUPABASE_URL = "여기에_본인의_SUPABASE_URL"
+SUPABASE_KEY = "여기에_본인의_SUPABASE_KEY"
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-SCHEMA = "kiwoom"
 supabase: Client = create_client(
     SUPABASE_URL,
-    SUPABASE_KEY
+    SUPABASE_KEY,
+    options=ClientOptions(schema="kiwoom")
 )
 
 
@@ -50,7 +46,6 @@ def get_my_profile(user_id):
 
         response = (
             supabase
-            .schema(SCHEMA)
             .table("user_info")
             .select("user_id, nickname")
             .eq("user_id", user_id)
@@ -80,7 +75,6 @@ def set_nickname(user_id, nickname):
 
         response = (
             supabase
-            .schema(SCHEMA)
             .table("user_info")
             .update({
                 "nickname": nickname
@@ -108,7 +102,6 @@ def get_open_session(user_id):
 
         response = (
             supabase
-            .schema(SCHEMA)
             .table("study_history")
             .select("*")
             .eq("user_id", user_id)
@@ -145,7 +138,6 @@ def start_session(user_id, subject, start_time):
 
         response = (
             supabase
-            .schema(SCHEMA)
             .table("study_history")
             .insert(data)
             .execute()
@@ -158,50 +150,6 @@ def start_session(user_id, subject, start_time):
         print("공부 시작 저장 오류:", e)
 
         return False
-
-
-# --------------------------------
-# 개인 통계
-# --------------------------------
-
-def get_my_stats(p_days):
-
-    try:
-
-        response = supabase.rpc(
-            "get_my_stats",
-            {"p_days": p_days}
-        ).execute()
-
-        return response.data or []
-
-    except Exception as e:
-
-        print("개인 통계 조회 오류:", e)
-
-        return []
-
-
-# --------------------------------
-# 비교 통계
-# --------------------------------
-
-def get_leaderboard(p_days):
-
-    try:
-
-        response = supabase.rpc(
-            "get_leaderboard",
-            {"p_days": p_days}
-        ).execute()
-
-        return response.data or []
-
-    except Exception as e:
-
-        print("비교 통계 조회 오류:", e)
-
-        return []
 
 
 # --------------------------------
@@ -234,7 +182,6 @@ def end_session(user_id, end_time):
 
         response = (
             supabase
-            .schema(SCHEMA)
             .table("study_history")
             .update({
                 "end_time": end_time.isoformat(),
@@ -252,3 +199,82 @@ def end_session(user_id, end_time):
         print("공부 종료 저장 오류:", e)
 
         return False
+
+
+# --------------------------------
+# [통계] 내 공부 기록 (완료된 세션만)
+#   study_history_user_time 인덱스 (user_id, start_time DESC)를
+#   그대로 타는 조회입니다. 여기서 받은 원본 기록을 stats.py에서
+#   pandas로 집계/시각화합니다.
+# --------------------------------
+
+def get_my_study_history(user_id):
+
+    try:
+
+        response = (
+            supabase
+            .table("study_history")
+            .select("subject, start_time, end_time")
+            .eq("user_id", user_id)
+            .not_.is_("end_time", "null")
+            .order("start_time", desc=True)
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("공부 기록 조회 오류:", e)
+
+        return []
+
+
+# --------------------------------
+# [통계] 전체 사용자 공부 기록 (비교용, 완료된 세션만)
+# --------------------------------
+
+def get_all_study_history():
+
+    try:
+
+        response = (
+            supabase
+            .table("study_history")
+            .select("user_id, subject, start_time, end_time")
+            .not_.is_("end_time", "null")
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("전체 공부 기록 조회 오류:", e)
+
+        return []
+
+
+# --------------------------------
+# [통계] 전체 닉네임 목록 (비교 결과에 이름 붙이는 용도)
+# --------------------------------
+
+def get_all_nicknames():
+
+    try:
+
+        response = (
+            supabase
+            .table("user_info")
+            .select("user_id, nickname")
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("닉네임 목록 조회 오류:", e)
+
+        return []
