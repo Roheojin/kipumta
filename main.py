@@ -1,5 +1,3 @@
-from getpass import getpass
-
 from db import sign_in
 
 from users import check_nickname

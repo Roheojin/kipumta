@@ -1,14 +1,21 @@
+import os
+
+from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
-# --------------------------------
-# Supabase 연결
-# --------------------------------
+load_dotenv()
 
-SUPABASE_URL = "https://qellozatydmcburshkja.supabase.co"
-SUPABASE_KEY = "sb_publishable_P7SJaalnZpSfUSfGELUAeg_vrmT-nE2"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 SCHEMA = "kiwoom"
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+
+    raise SystemExit(
+        ".env 파일에 SUPABASE_URL과 SUPABASE_KEY를 설정하세요."
+    )
 
 supabase: Client = create_client(
     SUPABASE_URL,
@@ -147,7 +154,7 @@ def start_session(user_id, subject, start_time):
             .execute()
         )
 
-        return True
+        return len(response.data) > 0
 
     except Exception as e:
 
@@ -241,7 +248,7 @@ def end_session(user_id, end_time):
             .execute()
         )
 
-        return True
+        return len(response.data) > 0
 
     except Exception as e:
 
