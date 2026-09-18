@@ -161,50 +161,6 @@ def start_session(user_id, subject, start_time):
 
 
 # --------------------------------
-# 개인 통계
-# --------------------------------
-
-def get_my_stats(p_days):
-
-    try:
-
-        response = supabase.rpc(
-            "get_my_stats",
-            {"p_days": p_days}
-        ).execute()
-
-        return response.data or []
-
-    except Exception as e:
-
-        print("개인 통계 조회 오류:", e)
-
-        return []
-
-
-# --------------------------------
-# 비교 통계
-# --------------------------------
-
-def get_leaderboard(p_days):
-
-    try:
-
-        response = supabase.rpc(
-            "get_leaderboard",
-            {"p_days": p_days}
-        ).execute()
-
-        return response.data or []
-
-    except Exception as e:
-
-        print("비교 통계 조회 오류:", e)
-
-        return []
-
-
-# --------------------------------
 # 공부 종료
 # --------------------------------
 
@@ -252,3 +208,85 @@ def end_session(user_id, end_time):
         print("공부 종료 저장 오류:", e)
 
         return False
+
+
+# --------------------------------
+# [통계] 내 공부 기록 (완료된 세션만)
+#   study_history_user_time 인덱스 (user_id, start_time DESC)를
+#   그대로 타는 조회입니다. 여기서 받은 원본 기록을 stats.py에서
+#   pandas로 집계/시각화합니다.
+# --------------------------------
+
+def get_my_study_history(user_id):
+
+    try:
+
+        response = (
+            supabase
+            .schema(SCHEMA)
+            .table("study_history")
+            .select("subject, start_time, end_time")
+            .eq("user_id", user_id)
+            .not_.is_("end_time", "null")
+            .order("start_time", desc=True)
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("공부 기록 조회 오류:", e)
+
+        return []
+
+
+# --------------------------------
+# [통계] 전체 사용자 공부 기록 (비교용, 완료된 세션만)
+# --------------------------------
+
+def get_all_study_history():
+
+    try:
+
+        response = (
+            supabase
+            .schema(SCHEMA)
+            .table("study_history")
+            .select("user_id, subject, start_time, end_time")
+            .not_.is_("end_time", "null")
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("전체 공부 기록 조회 오류:", e)
+
+        return []
+
+
+# --------------------------------
+# [통계] 전체 닉네임 목록 (비교 결과에 이름 붙이는 용도)
+# --------------------------------
+
+def get_all_nicknames():
+
+    try:
+
+        response = (
+            supabase
+            .schema(SCHEMA)
+            .table("user_info")
+            .select("user_id, nickname")
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("닉네임 목록 조회 오류:", e)
+
+        return []
