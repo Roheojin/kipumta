@@ -1,10 +1,9 @@
-from getpass import getpass
-
 from db import sign_in
 
 from users import check_nickname
 
 from study import study_menu
+
 
 
 # --------------------------------
@@ -21,7 +20,7 @@ def login():
         print("================================")
 
         email = input("이메일: ")
-        password = getpass("비밀번호: ")
+        password = input("비밀번호: ")
 
 
         print()
@@ -89,9 +88,8 @@ def main_menu(user_id, nickname):
         # --------------------------------
 
         elif choice == "2":
-
-            print()
-            print("통계 기능은 준비 중입니다.")
+            print('통계 구현중')
+            break
 
 
         # --------------------------------

@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
@@ -5,11 +8,12 @@ from supabase import create_client, Client
 # Supabase 연결
 # --------------------------------
 
-SUPABASE_URL = "https://qellozatydmcburshkja.supabase.co"
-SUPABASE_KEY = "sb_publishable_P7SJaalnZpSfUSfGELUAeg_vrmT-nE2"
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 SCHEMA = "kiwoom"
-
 supabase: Client = create_client(
     SUPABASE_URL,
     SUPABASE_KEY
@@ -154,6 +158,50 @@ def start_session(user_id, subject, start_time):
         print("공부 시작 저장 오류:", e)
 
         return False
+
+
+# --------------------------------
+# 개인 통계
+# --------------------------------
+
+def get_my_stats(p_days):
+
+    try:
+
+        response = supabase.rpc(
+            "get_my_stats",
+            {"p_days": p_days}
+        ).execute()
+
+        return response.data or []
+
+    except Exception as e:
+
+        print("개인 통계 조회 오류:", e)
+
+        return []
+
+
+# --------------------------------
+# 비교 통계
+# --------------------------------
+
+def get_leaderboard(p_days):
+
+    try:
+
+        response = supabase.rpc(
+            "get_leaderboard",
+            {"p_days": p_days}
+        ).execute()
+
+        return response.data or []
+
+    except Exception as e:
+
+        print("비교 통계 조회 오류:", e)
+
+        return []
 
 
 # --------------------------------
