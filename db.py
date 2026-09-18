@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from supabase.lib.client_options import ClientOptions
 
 
 # --------------------------------
@@ -14,10 +13,10 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+SCHEMA = "kiwoom"
 supabase: Client = create_client(
     SUPABASE_URL,
-    SUPABASE_KEY,
-    options=ClientOptions(schema="kiwoom")
+    SUPABASE_KEY
 )
 
 
@@ -51,6 +50,7 @@ def get_my_profile(user_id):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("user_info")
             .select("user_id, nickname")
             .eq("user_id", user_id)
@@ -80,6 +80,7 @@ def set_nickname(user_id, nickname):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("user_info")
             .update({
                 "nickname": nickname
@@ -107,6 +108,7 @@ def get_open_session(user_id):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("study_history")
             .select("*")
             .eq("user_id", user_id)
@@ -143,6 +145,7 @@ def start_session(user_id, subject, start_time):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("study_history")
             .insert(data)
             .execute()
@@ -187,6 +190,7 @@ def end_session(user_id, end_time):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("study_history")
             .update({
                 "end_time": end_time.isoformat(),
@@ -219,6 +223,7 @@ def get_my_study_history(user_id):
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("study_history")
             .select("subject, start_time, end_time")
             .eq("user_id", user_id)
@@ -246,6 +251,7 @@ def get_all_study_history():
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("study_history")
             .select("user_id, subject, start_time, end_time")
             .not_.is_("end_time", "null")
@@ -271,6 +277,7 @@ def get_all_nicknames():
 
         response = (
             supabase
+            .schema(SCHEMA)
             .table("user_info")
             .select("user_id, nickname")
             .execute()
