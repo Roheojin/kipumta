@@ -1,6 +1,3 @@
-import os
-
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
@@ -8,12 +5,11 @@ from supabase import create_client, Client
 # Supabase 연결
 # --------------------------------
 
-load_dotenv()
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = "https://qellozatydmcburshkja.supabase.co"
+SUPABASE_KEY = "sb_publishable_P7SJaalnZpSfUSfGELUAeg_vrmT-nE2"
 
 SCHEMA = "kiwoom"
+
 supabase: Client = create_client(
     SUPABASE_URL,
     SUPABASE_KEY

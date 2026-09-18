@@ -1,9 +1,12 @@
+from getpass import getpass
+
 from db import sign_in
 
 from users import check_nickname
 
 from study import study_menu
 
+from stats import stats_menu
 
 
 # --------------------------------
@@ -88,8 +91,8 @@ def main_menu(user_id, nickname):
         # --------------------------------
 
         elif choice == "2":
-            print('통계 구현중')
-            break
+
+            stats_menu(nickname)
 
 
         # --------------------------------
