@@ -55,7 +55,7 @@ def study_menu(user_id):
 
         if choice == "1":
 
-            now = datetime.now()
+            now = datetime.now().astimezone()
 
             success = end_session(
                 user_id,
@@ -85,7 +85,7 @@ def study_menu(user_id):
     )
 
 
-    now = datetime.now()
+    now = datetime.now().astimezone()
 
 
     success = start_session(
